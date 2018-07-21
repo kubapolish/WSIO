@@ -22,8 +22,8 @@ namespace WSIO {
 			this._server.RestartAfterListenError = true;
 		}
 
-		private PlayerManager<TPlayer> _players { get; }
 		private RoomManager<TPlayer> _rooms { get; }
+		private PlayerManager<TPlayer> _players { get; }
 
 		public void Dispose() {
 		}
@@ -41,8 +41,18 @@ namespace WSIO {
 				};
 
 				socket.OnBinary = (data) => {
-					using (var ms = new MemoryStream(data))
-						ProtoSerializer.Handle(socket, ms);
+					var player = default(TPlayer);
+
+					var players = this._players.Items;
+					foreach(var i in players) {
+						if (i.Socket == socket)
+							player = i;
+					}
+
+					if (player != default(TPlayer))
+						using (var ms = new MemoryStream(data))
+							ProtoSerializer.Handle(player, this._rooms, ms);
+					else Console.WriteLine($"Could not find player for {socket?.ConnectionInfo?.ClientIpAddress}");
 				};
 
 				socket.OnClose = () => {

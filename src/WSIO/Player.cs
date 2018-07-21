@@ -11,6 +11,7 @@ namespace WSIO {
 
 		public IRoom ConnectedTo { get; private set; }
 
+		/// <remarks>Please use the room.ConnectTo method instead if you can</remarks>
 		internal void ConnectTo(IRoom room) => this.ConnectedTo = room;
 
 		public void SetupBy(PlayerRequest request)

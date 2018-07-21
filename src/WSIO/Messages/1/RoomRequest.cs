@@ -12,6 +12,6 @@ namespace WSIO.Messages.v1 {
 		public string RoomType { get; set; }
 
 		[ProtoMember(4)]
-		public string Roomid { get; set; }
+		public string RoomId { get; set; }
 	}
 }

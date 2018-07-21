@@ -13,7 +13,9 @@ namespace WSIO.Tester
 
 	[RoomType("blocks")]
 	public class BlockRoom : Room<MyPlayer> {
-
+		public override void OnJoin(MyPlayer p) {
+			
+		}
 	}
 
     class Program

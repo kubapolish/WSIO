@@ -18,7 +18,7 @@
 
 	internal interface IRoomRequest : IProtoMessage {
 		string RoomType { get; set; }
-		string Roomid { get; set; }
+		string RoomId { get; set; }
 	}
 
 	internal interface ISuccessState : IProtoMessage {

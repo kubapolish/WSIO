@@ -12,7 +12,8 @@ namespace WSIO.Messages {
 
 	internal abstract class MessageHandler {
 
-		public abstract void Handle(IWebSocketConnection ws, Stream data);
+		public abstract void Handle<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, Stream data)
+			where TPlayer : Player, new();
 	}
 
 	internal class V1Handler : MessageHandler {
@@ -26,22 +27,102 @@ namespace WSIO.Messages {
 			return instance;
 		}
 
-		public override async void Handle(IWebSocketConnection ws, Stream data) {
+		public override async void Handle<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, Stream data) {
 			if (!ProtoSerializer.Deserialize<ProtoMessage>(data, out var res)) {
-				await ws.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your message.")));
+				await ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your message.")));
 				return;
 			}
 
 			if (!ProtoMessage.FindTypeFor(res, out var type)) {
-				await ws.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to find the type for your message.")));
+				await ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to find the type for your message.")));
 				return;
 			}
 
 			switch (Activator.CreateInstance(type)) {
 				case IAuthentication auth: {
-					await ws.Send("w e e");
-				}
-				break;
+					if (auth.Username != null && auth.Password != null) {
+						// ok we want to login
+
+						if (ws.Username == null || ws.Password == null) {
+
+							// the player isn't authenticated, so we'll log them in
+
+						} else {
+
+							// send an error message
+
+						}
+
+					} else {
+						//logout
+						
+						if (ws.Username != null && ws.Password != null) {
+
+							// the player is authenticated, so we'll log them out
+
+						} else {
+
+							// send an error message
+
+						}
+					}
+				} break;
+
+				case IRegistration reg: {
+					if (reg.Username != null && reg.Password != null && reg.Email != null) {
+						// ok we want to register & login
+
+						if (ws.Username == null || ws.Password == null) {
+
+							// the player isn't authenticated, so we'll register & log them in
+
+						} else {
+
+							// send an error message
+
+						}
+
+					} else {
+
+						// send an error message
+
+					}
+				} break;
+
+				case IRoomRequest req: {
+					if (req.RoomId != null && req.RoomType != null) {
+
+						// room id & type isn't null, connect them to that room
+
+						var room = rooms.FindOrCreateBy(new RoomRequest(req.RoomId, req.RoomType));
+						room.Connect(ws);
+
+					} else {
+
+						// it's null
+
+						if (ws.ConnectedTo != null) {
+
+							// if they're connected somewhere, disconnect them
+
+							var room = ws.ConnectedTo;
+							((Room<TPlayer>)room).Disconnect(ws);
+
+						} else {
+
+							// send an error
+
+						}
+
+					}
+				} break;
+
+				/*
+				//case message:
+				case ISuccessState suc: {
+
+				} break;
+				*/
 
 				default: break;
 			}
