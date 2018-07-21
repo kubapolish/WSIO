@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Fleck" Version="1.0.3" />
     <PackageReference Include="mongodb.driver" Version="2.7.0" />
     <PackageReference Include="protobuf-net" Version="2.3.13" />
-    <PackageReference Include="vtortola.WebSocketListener" Version="3.0.0" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,8 @@
 ﻿using ProtoBuf;
+
 using System;
 using System.Reflection;
+
 using WSIO.Attributes;
 
 namespace WSIO.Messages {
@@ -10,13 +12,14 @@ namespace WSIO.Messages {
 	[ProtoInclude(4, typeof(v1.Authentication))]
 	[ProtoInclude(5, typeof(v1.Registration))]
 	[ProtoInclude(6, typeof(v1.RoomRequest))]
-	internal class ProtoMessage {
+	internal class ProtoMessage : IProtoMessage {
+
 		[ProtoMember(1)]
 		public uint ProtocolVersion { get; set; }
 
 		[ProtoMember(2)]
 		public uint MessageType { get; set; }
-		
+
 		public static T Create<T>()
 			where T : ProtoMessage
 		=> (T)Create(typeof(T));

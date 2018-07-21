@@ -17,6 +17,11 @@ namespace WSIO {
 			else this._items.Add(item);
 		}
 
+		public void Delete(TItem item) {
+			if (!this.ExistsBy(item.RequestInfo, out var __)) throw new Exception("Item doesn't exist");
+			else this._items.Remove(item);
+		}
+
 		public bool ExistsBy(TRequest request, out TItem item) {
 			item = this._items.Find(x => x.RequestInfo.Equals(request));
 

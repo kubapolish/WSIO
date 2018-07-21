@@ -1,10 +1,10 @@
-﻿using vtortola.WebSockets;
+﻿using Fleck;
 
 namespace WSIO {
 
 	public class PlayerRequest : IManagerRequest {
 
-		public PlayerRequest(string username, string password, WebSocket socket) {
+		public PlayerRequest(string username, string password, IWebSocketConnection socket) {
 			this.Username = username;
 			this.Password = password;
 			this.Socket = socket;
@@ -12,7 +12,7 @@ namespace WSIO {
 
 		public string Username { get; }
 		public string Password { get; }
-		public WebSocket Socket { get; }
+		public IWebSocketConnection Socket { get; }
 
 		public bool Equals(IManagerRequest other)
 			=> other is PlayerRequest req ?

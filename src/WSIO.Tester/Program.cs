@@ -20,13 +20,15 @@ namespace WSIO.Tester
     {
         static void Main(string[] args)
         {
-			using (var server = new Server<MyPlayer>(args, typeof(BlockRoom))) {
+			using (var server = new Server<MyPlayer>(args, 80, typeof(BlockRoom))) {
 
 				//var p = server.Generate(new PlayerRequest("John Doe", "password1", null));
 				//var room = server.Send(p, new RoomRequest("wee fun", "blocks"));
 
 				Console.WriteLine("Hello World!");
-				server.StartAsync();
+				Console.WriteLine(server.Location);
+				Console.WriteLine(server.Port);
+				server.Start();
 				Console.ReadLine();
 			}
         }

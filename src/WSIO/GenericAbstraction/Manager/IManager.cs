@@ -7,6 +7,8 @@
 
 		void Add(TItem item);
 
+		void Delete(TItem item);
+
 		bool ExistsBy(TRequest request, out TItem item);
 
 		TItem FindBy(TRequest request);

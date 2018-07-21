@@ -1,10 +1,11 @@
-﻿using ProtoBuf;
-using System;
-using System.Collections.Generic;
+﻿using Fleck;
+
+using ProtoBuf;
+
 using System.IO;
-using System.Text;
 
 namespace WSIO.Messages {
+
 	internal static class ProtoSerializer {
 
 		public static bool Deserialize<T>(Stream data, out T result)
@@ -24,33 +25,28 @@ namespace WSIO.Messages {
 			return success;
 		}
 
-		public static async Task Write<T>(T msg, WebSocket ws)
+		public static byte[] Serialize<T>(T item)
 			where T : ProtoMessage {
 			using (var ms = new MemoryStream()) {
-				Serializer.Serialize<T>(ms, msg);
-				await Write(ms.ToArray(), ws);
+				//TODO: try catch protoexception?
+				Serializer.Serialize<T>(ms, item);
+				return ms.ToArray();
 			}
-		}
-
-		public static async Task Write(byte[] data, WebSocket ws) {
-			var writer = ws.CreateMessageWriter(WebSocketMessageType.Binary);
-			await writer.WriteAsync(data, 0, data.Length);
-			await writer.FlushAsync();
 		}
 
 		public static T CreateInstance<T>(this T msg)
 			where T : ProtoMessage
 			=> ProtoMessage.Create<T>();
 
-		//TODO: put protocol generators in a custom class
+		private static V1Handler _v1 = null;
+		public static MessageHandler V1 => _v1 ?? (_v1 = new V1Handler());
 
-		public static v1.SuccessState GetV1Success(bool state, string reason = null) {
-			var instance = new v1.SuccessState().CreateInstance();
+		public static void Handle(IWebSocketConnection socket, MemoryStream ms) {
+			//TODO: handle different protocol versions
 
-			instance.State = state;
-			instance.Reason = reason;
+			// :p
 
-			return instance;
+			V1.Handle(socket, ms);
 		}
 	}
 }

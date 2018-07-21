@@ -1,11 +1,13 @@
 ﻿using ProtoBuf;
+
 using WSIO.Attributes;
 
 namespace WSIO.Messages.v1 {
 
 	[ProtoContract]
 	[MessageVersion(1, 2)]
-	internal class Authentication : ProtoMessage {
+	internal class Authentication : ProtoMessage, IAuthentication {
+
 		[ProtoMember(3)]
 		public string Username { get; set; }
 

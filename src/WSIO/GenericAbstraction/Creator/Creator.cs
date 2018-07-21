@@ -35,5 +35,7 @@ namespace WSIO {
 			this.Add(item);
 			return item;
 		}
+
+		public void Delete(TItem item) => this._manager.Delete(item);
 	}
 }

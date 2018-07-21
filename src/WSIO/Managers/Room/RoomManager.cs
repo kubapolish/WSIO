@@ -24,6 +24,8 @@ namespace WSIO {
 
 		public void Add(Room<TPlayer> item) => this._manager.Add(item);
 
+		public void Delete(Room<TPlayer> item) => this._manager.Delete(item);
+
 		public bool CanCreate(RoomRequest request) => GetRoomForType(request.RoomType) != null && !this._manager.ExistsBy(request, out var __);
 
 		public Room<TPlayer> CreateBy(RoomRequest request) {
