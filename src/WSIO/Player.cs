@@ -1,4 +1,4 @@
-﻿using Fleck;
+﻿using vtortola.WebSockets;
 
 namespace WSIO {
 
@@ -7,7 +7,7 @@ namespace WSIO {
 
 		public string Username => this.RequestInfo?.Username;
 		public string Password => this.RequestInfo?.Password;
-		public IWebSocketConnection Socket => this.RequestInfo?.Socket;
+		public WebSocket Socket => this.RequestInfo?.Socket;
 
 		public IRoom ConnectedTo { get; private set; }
 
