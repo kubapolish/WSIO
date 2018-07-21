@@ -28,6 +28,11 @@ namespace WSIO {
 		public void Dispose() {
 		}
 
+		public void Test() {
+		}
+
+		private bool __________ = false;
+
 		public void Start() {
 			this._server.Start((socket) => {
 				socket.OnOpen = () => {
@@ -49,16 +54,25 @@ namespace WSIO {
 							player = i;
 					}
 
-					if (player != default(TPlayer))
+					if (player != default(TPlayer)) {
+						
 						using (var ms = new MemoryStream(data))
 							ProtoSerializer.Handle(player, this._rooms, ms);
-					else Console.WriteLine($"Could not find player for {socket?.ConnectionInfo?.ClientIpAddress}");
+					} else Console.WriteLine($"Could not find player for {socket?.ConnectionInfo?.ClientIpAddress}");
 				};
 
 				socket.OnClose = () => {
 					foreach (var i in this._players.Items)
-						if (i.Socket == socket)
+						if (i.Socket == socket) {
 							this._players.Delete(i);
+							if(i.ConnectedTo != null) {
+								((Room<TPlayer>)i.ConnectedTo).Disconnect(i);
+
+								if(i.Username != null && i.Password != null) {
+									//TODO: log them out
+								}
+							}
+						}
 				};
 			});
 		}

@@ -5,7 +5,7 @@ using TimedQuery;
 namespace WSIO {
 
 	[RoomType(null)]
-	public class Room<TPlayer> : IRoom<TPlayer>, IManagerItem<RoomRequest>
+	public class Room<TPlayer> : IRoom<TPlayer>, IManagerItem<RoomRequest>, IDisposable
 		where TPlayer : Player, new() {
 		internal PlayerManager<TPlayer> _players;
 
@@ -21,7 +21,7 @@ namespace WSIO {
 		private void ProcessQuery(RoomItem<TPlayer> item) {
 			switch (item.Event) {
 				case RoomEvent.Creation: {
-					Creation();
+					OnCreation();
 				} break;
 
 				case RoomEvent.Join: {
@@ -108,14 +108,20 @@ namespace WSIO {
 				WaitForFinish(itm);
 		}
 
-		public void SetupBy(RoomRequest request)
-			=> this.RequestInfo = request;
+		public void SetupBy(RoomRequest request) {
+			this.Creation();
+			this.RequestInfo = request;
+		}
 
 		public virtual void OnCreation() { }
 		public virtual void OnJoin(TPlayer p) { }
 		public virtual void OnMessage(TPlayer p) { }
 		public virtual void OnLeave(TPlayer p) { }
 		public virtual void OnDeletion() { }
+
+		public void Dispose() {
+			this._query.Dispose();
+		}
 	}
 
 	internal class RoomItem<TPlayer> : IDisposable

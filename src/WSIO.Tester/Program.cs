@@ -13,9 +13,17 @@ namespace WSIO.Tester
 
 	[RoomType("blocks")]
 	public class BlockRoom : Room<MyPlayer> {
+		public override void OnCreation() => Console.WriteLine($"Creation! {this.RoomId} {this.RoomType}");
+
 		public override void OnJoin(MyPlayer p) {
-			
+			Console.WriteLine($"{p.Username} joined!");
 		}
+
+		public override void OnMessage(MyPlayer p) => Console.WriteLine($"{p.Username} sent a message!");
+
+		public override void OnLeave(MyPlayer p) => Console.WriteLine($"{p.Username} left!");
+
+		public override void OnDeletion() => Console.WriteLine($"Deletion! {this.RoomId} {this.RoomType}");
 	}
 
     class Program
