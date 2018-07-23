@@ -6,12 +6,15 @@ namespace WSIO.Messages.v1 {
 
 	[ProtoContract]
 	[MessageVersion(1, 1)]
-	internal class SuccessState : ProtoMessage, ISuccessState {
+	internal class SuccessState : IProtoMessage, ISuccessState {
 
-		[ProtoMember(3)]
+		[ProtoMember(1)]
+		public ProtoMessage ProtoDefs { get; set; }
+
+		[ProtoMember(2)]
 		public bool State { get; set; }
 
-		[ProtoMember(4)]
+		[ProtoMember(3)]
 		public string Reason { get; set; }
 	}
 }

@@ -6,12 +6,15 @@ namespace WSIO.Messages.v1 {
 
 	[ProtoContract]
 	[MessageVersion(1, 4)]
-	internal class RoomRequest : ProtoMessage, IRoomRequest {
+	internal class RoomRequest : IProtoMessage, IRoomRequest {
 
-		[ProtoMember(3)]
+		[ProtoMember(1)]
+		public ProtoMessage ProtoDefs { get; set; }
+
+		[ProtoMember(2)]
 		public string RoomType { get; set; }
 
-		[ProtoMember(4)]
+		[ProtoMember(3)]
 		public string RoomId { get; set; }
 	}
 }

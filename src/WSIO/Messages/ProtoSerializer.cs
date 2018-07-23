@@ -9,8 +9,11 @@ namespace WSIO.Messages {
 	internal static class ProtoSerializer {
 
 		public static bool Deserialize<T>(Stream data, out T result)
-			where T : ProtoMessage {
+			where T : IProtoMessage {
 			var success = false;
+
+			if (data.CanSeek)
+				data.Seek(0, SeekOrigin.Begin);
 
 			try {
 				result = Serializer.Deserialize<T>(data);
@@ -26,7 +29,7 @@ namespace WSIO.Messages {
 		}
 
 		public static byte[] Serialize<T>(T item)
-			where T : ProtoMessage {
+			where T : IProtoMessage {
 			using (var ms = new MemoryStream()) {
 				//TODO: try catch protoexception?
 				Serializer.Serialize<T>(ms, item);
@@ -35,7 +38,7 @@ namespace WSIO.Messages {
 		}
 
 		public static T CreateInstance<T>(this T msg)
-			where T : ProtoMessage
+			where T : IProtoMessage
 			=> ProtoMessage.Create<T>();
 
 		private static V1Handler _v1 = null;

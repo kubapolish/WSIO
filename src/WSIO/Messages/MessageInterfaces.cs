@@ -1,8 +1,7 @@
 ﻿namespace WSIO.Messages {
 
 	internal interface IProtoMessage {
-		uint ProtocolVersion { get; set; }
-		uint MessageType { get; set; }
+		ProtoMessage ProtoDefs { get; set; }
 	}
 
 	internal interface IAuthentication : IProtoMessage {

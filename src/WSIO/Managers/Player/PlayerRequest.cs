@@ -16,7 +16,8 @@ namespace WSIO {
 
 		public bool Equals(IManagerRequest other)
 			=> other is PlayerRequest req ?
-				(req.Username == this.Username)
+				(req.Username == this.Username &&
+				req.Socket.ConnectionInfo.Id == this.Socket.ConnectionInfo.Id)
 				: false;
 	}
 }

@@ -89,6 +89,7 @@ namespace WSIO {
 		}
 
 		internal void Disconnect(TPlayer p) {
+			Console.WriteLine("this._players");
 			this._players.Delete(p);
 			p.ConnectTo(null);
 			
@@ -109,7 +110,7 @@ namespace WSIO {
 		}
 
 		public void SetupBy(RoomRequest request) {
-			this.Creation();
+			//this.Creation();
 			this.RequestInfo = request;
 		}
 

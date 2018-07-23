@@ -12,6 +12,15 @@ namespace WSIO.Messages {
 
 	internal abstract class MessageHandler {
 
+		public static void DisconnectPlayerFrom<TPlayer>(RoomManager<TPlayer> rooms, Room<TPlayer> room, TPlayer p)
+			where TPlayer : Player, new() {
+			room.Disconnect(p);
+			if (room._players.Items.Length < 1) {
+				room.Deletion();
+				rooms.Delete(room);
+			}
+		}
+
 		public abstract void Handle<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, Stream data)
 			where TPlayer : Player, new();
 	}
@@ -27,16 +36,8 @@ namespace WSIO.Messages {
 			return instance;
 		}
 
-		private void DisconnectPlayerFrom<TPlayer>(RoomManager<TPlayer> rooms, Room<TPlayer> room, TPlayer p)
-			where TPlayer : Player, new() {
-			room.Disconnect(p);
-			if (room._players.Items.Length < 1)
-				room.Deletion();
-			rooms.Delete(room);
-		}
-
 		public override async void Handle<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, Stream data) {
-			if (!ProtoSerializer.Deserialize<ProtoMessage>(data, out var res)) {
+			if (!ProtoSerializer.Deserialize<SimpleIProtoMessageInheriter>(data, out var res)) {
 				await ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your message.")));
 				return;
 			}
@@ -81,6 +82,9 @@ namespace WSIO.Messages {
 					// the player isn't authenticated, so we'll log them in
 					ws.SetupBy(new PlayerRequest(auth.Username, auth.Password, ws.Socket));
 
+					ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(true)));
+
+
 				} else {
 
 					// send an error message
@@ -93,6 +97,8 @@ namespace WSIO.Messages {
 				if (ws.Username != null && ws.Password != null) {
 
 					// the player is authenticated, so we'll log them out
+
+					ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(true)));
 
 				} else {
 
@@ -109,7 +115,18 @@ namespace WSIO.Messages {
 				// room id & type isn't null, connect them to that room
 
 				var room = rooms.FindOrCreateBy(new RoomRequest(req.RoomId, req.RoomType));
-				room.Connect(ws);
+
+				if (room != null) {
+
+					room.Connect(ws);
+
+					ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(true)));
+
+				} else {
+
+					ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "A room of that room type couldn't be found.")));
+
+				}
 
 			} else {
 
@@ -121,6 +138,8 @@ namespace WSIO.Messages {
 
 					var room = ws.ConnectedTo;
 					DisconnectPlayerFrom(rooms, ((Room<TPlayer>)room), ws);
+
+					ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(true)));
 
 				} else {
 

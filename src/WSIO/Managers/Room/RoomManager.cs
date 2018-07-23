@@ -44,13 +44,18 @@ namespace WSIO {
 			var t = GetRoomForType(request.RoomType);
 			if (t == null) return null;
 
-			return this._manager.ExistsBy(request, out var __) ? __ : this.Create(t, request);
+			var rm = (Room<TPlayer>)Activator.CreateInstance(t);
+			rm.SetupBy(request);
+
+			lock(this._manager._lock)
+				return this._manager.UnlockedExistsBy(request, out var __) ? __ : this.Create(t, request);
 		}
 
 		private Room<TPlayer> Create(Type t, RoomRequest request) {
 			var rm = (Room<TPlayer>)Activator.CreateInstance(t);
 			rm.SetupBy(request);
-			this._manager.Add(rm);
+			this._manager.UnlockedAdd(rm);
+			rm.Creation();
 
 			return rm;
 		}

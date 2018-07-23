@@ -6,15 +6,18 @@ namespace WSIO.Messages.v1 {
 
 	[ProtoContract]
 	[MessageVersion(1, 3)]
-	internal class Registration : ProtoMessage, IRegistration {
+	internal class Registration : IProtoMessage, IRegistration {
 
-		[ProtoMember(3)]
+		[ProtoMember(1)]
+		public ProtoMessage ProtoDefs { get; set; }
+
+		[ProtoMember(2)]
 		public string Username { get; set; }
 
-		[ProtoMember(4)]
+		[ProtoMember(3)]
 		public string Password { get; set; }
 
-		[ProtoMember(5)]
+		[ProtoMember(4)]
 		public string Email { get; set; }
 	}
 }

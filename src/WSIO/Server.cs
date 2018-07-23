@@ -63,15 +63,19 @@ namespace WSIO {
 
 				socket.OnClose = () => {
 					foreach (var i in this._players.Items)
-						if (i.Socket == socket) {
-							this._players.Delete(i);
+						if (i?.Socket?.ConnectionInfo?.Id == socket.ConnectionInfo.Id) {
+							
 							if(i.ConnectedTo != null) {
-								((Room<TPlayer>)i.ConnectedTo).Disconnect(i);
-
-								if(i.Username != null && i.Password != null) {
-									//TODO: log them out
-								}
+								MessageHandler.DisconnectPlayerFrom(this._rooms, ((Room<TPlayer>)i.ConnectedTo), i);
 							}
+
+							if (i.Username != null && i.Password != null) {
+								//TODO: log them out
+							}
+							
+							this._players.Delete(i);
+
+							break;
 						}
 				};
 			});
