@@ -42,7 +42,7 @@ namespace WSIO.Messages {
 				return;
 			}
 
-			if (!ProtoMessage.FindTypeFor(res, out var type)) {
+			if (!ProtocolDefinition.FindTypeFor(res, out var type)) {
 				await ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to find the type for your message.")));
 				return;
 			}
@@ -150,6 +150,16 @@ namespace WSIO.Messages {
 			}
 		}
 
+		internal void HandleMessage<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, IMessage msg)
+			where TPlayer : Player, new() {
+			if(ws.ConnectedTo != null) {
+
+				var room = (Room<TPlayer>)ws.ConnectedTo;
+				room.Message(ws, msg);
+
+			} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "You're not connected to a room!")));
+		}
+
 		internal void HandlePacket<TPlayer>(Type type, TPlayer ws, RoomManager<TPlayer> rooms, Stream data)
 			where TPlayer : Player, new() {
 			switch (Activator.CreateInstance(type)) {
@@ -158,7 +168,7 @@ namespace WSIO.Messages {
 						auth = __;
 
 						HandleAuth(ws, rooms, auth);
-					}
+					} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your authentication packet.")));
 				} break;
 
 				case IRegistration reg: {
@@ -166,7 +176,7 @@ namespace WSIO.Messages {
 						reg = __;
 
 						HandleReg(ws, rooms, reg);
-					}
+					} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your registration packet.")));
 				} break;
 
 				case IRoomRequest req: {
@@ -174,15 +184,16 @@ namespace WSIO.Messages {
 						req = __;
 
 						HandleRoom(ws, rooms, req);
-					}
+					} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your roomrequest packet.")));
 				} break;
 
-				/*
-				//case message:
-				case ISuccessState suc: {
+				case IMessage msg: {
+					if (ProtoSerializer.Deserialize<v1.Message>(data, out var __)) {
+						msg = __;
 
+						HandleMessage(ws, rooms, msg);
+					} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your message packet.")));
 				} break;
-				*/
 
 				default: break;
 			}

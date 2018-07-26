@@ -19,7 +19,7 @@ namespace WSIO.Tester
 			Console.WriteLine($"{p.Username} joined!");
 		}
 
-		public override void OnMessage(MyPlayer p) => Console.WriteLine($"{p.Username} sent a message!");
+		public override void OnMessage(MyPlayer p, Message msg) => Console.WriteLine($"{p.Username} sent a message!");
 
 		public override void OnLeave(MyPlayer p) => Console.WriteLine($"{p.Username} left!");
 

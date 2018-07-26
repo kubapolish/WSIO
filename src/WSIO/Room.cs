@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using TimedQuery;
+using WSIO.Messages;
 
 namespace WSIO {
 
@@ -29,7 +30,7 @@ namespace WSIO {
 				} break;
 
 				case RoomEvent.Message: {
-					OnMessage(item.PlayerData);
+					OnMessage(item.PlayerData, new Message(item.MessageData));
 				} break;
 
 				case RoomEvent.Leave: {
@@ -80,11 +81,11 @@ namespace WSIO {
 				WaitForFinish(itm);
 		}
 
-		internal void Message(TPlayer p) {
+		internal void Message(TPlayer p, IMessage msg) {
 			this._query.AddQueryItem(new RoomItem<TPlayer> {
 				Event = RoomEvent.Message,
 				PlayerData = p,
-				//TODO: message
+				MessageData = msg,
 			});
 		}
 
@@ -116,7 +117,7 @@ namespace WSIO {
 
 		public virtual void OnCreation() { }
 		public virtual void OnJoin(TPlayer p) { }
-		public virtual void OnMessage(TPlayer p) { }
+		public virtual void OnMessage(TPlayer p, Message msg) { }
 		public virtual void OnLeave(TPlayer p) { }
 		public virtual void OnDeletion() { }
 
@@ -134,7 +135,7 @@ namespace WSIO {
 		public bool DoDispose { get; set; } = true;
 
 		public TPlayer PlayerData { get; set; }
-		public object MessageData { get; set; }
+		public IMessage MessageData { get; set; }
 
 		public void Dispose() {
 			if (this.DoDispose) {

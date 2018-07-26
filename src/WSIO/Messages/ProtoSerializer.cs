@@ -39,7 +39,7 @@ namespace WSIO.Messages {
 
 		public static T CreateInstance<T>(this T msg)
 			where T : IProtoMessage
-			=> ProtoMessage.Create<T>();
+			=> ProtocolDefinition.Create<T>();
 
 		private static V1Handler _v1 = null;
 		public static MessageHandler V1 => _v1 ?? (_v1 = new V1Handler());

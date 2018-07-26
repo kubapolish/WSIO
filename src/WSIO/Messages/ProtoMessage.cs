@@ -11,7 +11,7 @@ namespace WSIO.Messages {
 	internal class SimpleIProtoMessageInheriter : IProtoMessage {
 
 		[ProtoMember(1)]
-		public ProtoMessage ProtoDefs { get; set; }
+		public ProtocolDefinition ProtoDefs { get; set; }
 	}
 
 	[ProtoContract]
@@ -19,7 +19,7 @@ namespace WSIO.Messages {
 	[ProtoInclude(4, typeof(v1.Authentication))]
 	[ProtoInclude(5, typeof(v1.Registration))]
 	[ProtoInclude(6, typeof(v1.RoomRequest))]
-	internal class ProtoMessage {
+	internal class ProtocolDefinition {
 
 		[ProtoMember(1)]
 		public uint ProtocolVersion { get; set; }
@@ -37,7 +37,7 @@ namespace WSIO.Messages {
 				throw new Exception($"Please put a MessageVersionAttribute on {type}");
 			}
 
-			instance.ProtoDefs = new ProtoMessage {
+			instance.ProtoDefs = new ProtocolDefinition {
 				MessageType = attribute.MessageType,
 				ProtocolVersion = attribute.ProtocolVersion,
 			};

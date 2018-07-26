@@ -9,7 +9,7 @@ namespace WSIO.Messages.v1 {
 	internal class RoomRequest : IProtoMessage, IRoomRequest {
 
 		[ProtoMember(1)]
-		public ProtoMessage ProtoDefs { get; set; }
+		public ProtocolDefinition ProtoDefs { get; set; }
 
 		[ProtoMember(2)]
 		public string RoomType { get; set; }

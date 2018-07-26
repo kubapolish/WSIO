@@ -9,7 +9,7 @@ namespace WSIO.Messages.v1 {
 	internal class Registration : IProtoMessage, IRegistration {
 
 		[ProtoMember(1)]
-		public ProtoMessage ProtoDefs { get; set; }
+		public ProtocolDefinition ProtoDefs { get; set; }
 
 		[ProtoMember(2)]
 		public string Username { get; set; }
