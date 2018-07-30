@@ -7,17 +7,18 @@ using WSIO.Messages;
 
 namespace WSIO {
 
-	public class Server<TPlayer, TAuth> : IDisposable
-		where TPlayer : Player, new()
-		where TAuth : Authentication.IAuthModule {
+	public class Server<TPlayer> : IDisposable
+		where TPlayer : Player, new() {
 		private WebSocketServer _server;
-		private TAuth _auth;
+		private Authentication.IAuthModule _auth;
 
 		public string Location => this._server.Location;
 		public ushort Port => (ushort)this._server.Port;
 
-		public Server(string[] commandLineArgs, TAuth auther, ushort port, params Type[] enabledRooms) {
+		public Server(string[] commandLineArgs, Authentication.IAuthModule auther, ushort port, params Type[] enabledRooms) {
 			this._auth = auther;
+
+			Message.Constructor();
 
 			this._players = new PlayerManager<TPlayer>();
 			this._rooms = new RoomManager<TPlayer>(enabledRooms);

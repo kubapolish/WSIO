@@ -16,7 +16,7 @@ namespace WSIO.Messages.v1 {
 		public string Type { get; set; }
 
 		[ProtoMember(3)]
-		public List<IMessageItem> Items { get; set; }
+		public List<MessageItem> Items { get; set; }
 	}
 
 	[ProtoContract]
@@ -117,7 +117,59 @@ namespace WSIO.Messages.v1 {
 		public List<IMessageItem> InnerMessageItems { get; set; }
 		
 		public object Value() {
-			return new object();
+			switch(Type) {
+				case 1: {
+					if (this.DoubleValues.Count < 2)
+						return this.DoubleValues[0];
+					else return this.DoubleValues.ToArray();
+				}
+				case 2: {
+					if (this.FloatValues.Count < 2)
+						return this.FloatValues[0];
+					else return this.FloatValues.ToArray();
+				}
+				case 3: {
+					if (this.IntValues.Count < 2)
+						return this.IntValues[0];
+					else return this.IntValues.ToArray();
+				}
+				case 4: {
+					if (this.LongValues.Count < 2)
+						return this.LongValues[0];
+					else return this.LongValues.ToArray();
+				}
+				case 5: {
+					if (this.UintValues.Count < 2)
+						return this.UintValues[0];
+					else return this.UintValues.ToArray();
+				}
+				case 6: {
+					if (this.UlongValues.Count < 2)
+						return this.UlongValues[0];
+					else return this.UlongValues.ToArray();
+				}
+				case 7: {
+					if (this.BoolValues.Count < 2)
+						return this.BoolValues[0];
+					else return this.BoolValues.ToArray();
+				}
+				case 8: {
+					if (this.StringValues.Count < 2)
+						return this.StringValues[0];
+					else return this.StringValues.ToArray();
+				}
+				case 9: {
+					if (this.ByteArrayValues.Count < 2)
+						return this.ByteArrayValues[0];
+					else return this.ByteArrayValues.ToArray();
+				}
+				case 10: {
+					if (this.InnerMessageItems.Count < 2)
+						return this.InnerMessageItems[0];
+					else return this.InnerMessageItems.ToArray();
+				}
+				default: throw new Exception();
+			}
 		}
 	}
 }
