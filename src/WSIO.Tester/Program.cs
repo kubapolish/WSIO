@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 
 namespace WSIO.Tester
 {
@@ -28,8 +30,8 @@ namespace WSIO.Tester
 
     class Program
     {
-        static void Main(string[] args)
-        {
+        static void Main(string[] args) {
+			/*
 			using (var server = new Server<MyPlayer>(args, 80, typeof(BlockRoom))) {
 
 				//var p = server.Generate(new PlayerRequest("John Doe", "password1", null));
@@ -40,7 +42,7 @@ namespace WSIO.Tester
 				Console.WriteLine(server.Port);
 				server.Start();
 				Console.ReadLine();
-			}
+			}/**/
         }
     }
 }

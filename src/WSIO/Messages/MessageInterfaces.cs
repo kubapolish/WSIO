@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WSIO.Authentication;
 
 namespace WSIO.Messages {
 
@@ -6,14 +7,14 @@ namespace WSIO.Messages {
 		ProtocolDefinition ProtoDefs { get; set; }
 	}
 
-	internal interface IAuthentication : IProtoMessage {
+	internal interface IAuthentication : IProtoMessage, IPassword {
 		string Username { get; set; }
-		string Password { get; set; }
+		// IPassword // string Password { get; set; }
 	}
 
-	internal interface IRegistration : IProtoMessage {
+	internal interface IRegistration : IProtoMessage, IPassword {
 		string Username { get; set; }
-		string Password { get; set; }
+		// IPassword // string Password { get; set; }
 		string Email { get; set; }
 	}
 

@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using WSIO.Authentication;
 
 namespace WSIO.Messages {
 
@@ -21,7 +22,7 @@ namespace WSIO.Messages {
 			}
 		}
 
-		public abstract void Handle<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, Stream data)
+		public abstract void Handle<TPlayer>(TPlayer ws, Authentication.IAuthModule auther, RoomManager<TPlayer> rooms, Stream data)
 			where TPlayer : Player, new();
 	}
 
@@ -36,7 +37,7 @@ namespace WSIO.Messages {
 			return instance;
 		}
 
-		public override async void Handle<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, Stream data) {
+		public override async void Handle<TPlayer>(TPlayer ws, Authentication.IAuthModule auther, RoomManager<TPlayer> rooms, Stream data) {
 			if (!ProtoSerializer.Deserialize<SimpleIProtoMessageInheriter>(data, out var res)) {
 				await ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your message.")));
 				return;
@@ -47,17 +48,24 @@ namespace WSIO.Messages {
 				return;
 			}
 
-			HandlePacket(type, ws, rooms, data);
+			HandlePacket(type, ws, auther, rooms, data);
 		}
 
-		internal void HandleReg<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, IRegistration reg)
+		internal void HandleReg<TPlayer>(TPlayer ws, Authentication.IAuthModule auther, RoomManager<TPlayer> rooms, IRegistration reg)
 			where TPlayer : Player, new() {
 			if (reg.Username != null && reg.Password != null && reg.Email != null) {
 				// ok we want to register & login
 
 				if (ws.Username == null || ws.Password == null) {
 
-					// the player isn't authenticated, so we'll register & log them in
+					if (auther.Register(new Credentials(reg.Username, ws.Socket, reg.Password, reg.Email), out var token)) {
+						// they've been registered, let's log them in now
+
+						Login(ws, new Messages.v1.Authentication {
+							Username = reg.Username,
+							Password = reg.Password,
+						});
+					}
 
 				} else {
 
@@ -72,18 +80,30 @@ namespace WSIO.Messages {
 			}
 		}
 
-		internal void HandleAuth<TPlayer>(TPlayer ws, RoomManager<TPlayer> rooms, IAuthentication auth)
+		private void Login<TPlayer>(TPlayer ws, IAuthentication auth)
+			where TPlayer : Player, new() {
+			// the player isn't authenticated, so we'll log them in
+			ws.SetupBy(new PlayerRequest(auth.Username, auth.Password, ws.Socket));
+
+			ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(true)));
+		}
+
+		internal void HandleAuth<TPlayer>(TPlayer ws, Authentication.IAuthModule auther, RoomManager<TPlayer> rooms, IAuthentication auth)
 			where TPlayer : Player, new() {
 			if (auth.Username != null && auth.Password != null) {
 				// ok we want to login
 
 				if (ws.Username == null || ws.Password == null) {
 
-					// the player isn't authenticated, so we'll log them in
-					ws.SetupBy(new PlayerRequest(auth.Username, auth.Password, ws.Socket));
+					if (auther.Login(new Credentials(auth.Username, ws.Socket, auth.Password), out var token)) {
 
-					ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(true)));
+						Login(ws, auth);
 
+					} else {
+
+						// send an error message
+
+					}
 
 				} else {
 
@@ -160,14 +180,17 @@ namespace WSIO.Messages {
 			} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "You're not connected to a room!")));
 		}
 
-		internal void HandlePacket<TPlayer>(Type type, TPlayer ws, RoomManager<TPlayer> rooms, Stream data)
+		internal void HandlePacket<TPlayer>(Type type, TPlayer ws, Authentication.IAuthModule auther, RoomManager<TPlayer> rooms, Stream data)
 			where TPlayer : Player, new() {
 			switch (Activator.CreateInstance(type)) {
 				case IAuthentication auth: {
 					if (ProtoSerializer.Deserialize<v1.Authentication>(data, out var __)) {
 						auth = __;
 
-						HandleAuth(ws, rooms, auth);
+						// hash the message before we do literally anything with it
+						((IPassword)auth).Password = ((IPassword)auth).Hash().Password;
+
+						HandleAuth(ws, auther, rooms, auth);
 					} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your authentication packet.")));
 				} break;
 
@@ -175,7 +198,10 @@ namespace WSIO.Messages {
 					if (ProtoSerializer.Deserialize<v1.Registration>(data, out var __)) {
 						reg = __;
 
-						HandleReg(ws, rooms, reg);
+						// hash the message before we do literally anything with it
+						((IPassword)reg).Password = ((IPassword)reg).Hash().Password;
+
+						HandleReg(ws, auther, rooms, reg);
 					} else ws.Socket.Send(ProtoSerializer.Serialize(GetSuccess(false, "Unable to deserialize your registration packet.")));
 				} break;
 

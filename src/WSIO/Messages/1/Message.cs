@@ -115,10 +115,9 @@ namespace WSIO.Messages.v1 {
 
 		[ProtoMember(11)]
 		public List<IMessageItem> InnerMessageItems { get; set; }
-
-		[ProtoIgnore]
+		
 		public object Value() {
-
+			return new object();
 		}
 	}
 }

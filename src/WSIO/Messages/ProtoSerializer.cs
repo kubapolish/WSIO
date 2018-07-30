@@ -44,13 +44,13 @@ namespace WSIO.Messages {
 		private static V1Handler _v1 = null;
 		public static MessageHandler V1 => _v1 ?? (_v1 = new V1Handler());
 
-		public static void Handle<TPlayer>(TPlayer player, RoomManager<TPlayer> rooms, MemoryStream ms)
+		public static void Handle<TPlayer>(TPlayer player, Authentication.IAuthModule auther, RoomManager<TPlayer> rooms, MemoryStream ms)
 			where TPlayer : Player, new() {
 			//TODO: handle different protocol versions
 
 			// :p
 
-			V1.Handle(player, rooms, ms);
+			V1.Handle(player, auther, rooms, ms);
 		}
 	}
 }

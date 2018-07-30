@@ -2,19 +2,23 @@
 
 using System;
 using System.IO;
-
+using System.Net;
 using WSIO.Messages;
 
 namespace WSIO {
 
-	public class Server<TPlayer> : IDisposable
-		where TPlayer : Player, new() {
+	public class Server<TPlayer, TAuth> : IDisposable
+		where TPlayer : Player, new()
+		where TAuth : Authentication.IAuthModule {
 		private WebSocketServer _server;
+		private TAuth _auth;
 
 		public string Location => this._server.Location;
 		public ushort Port => (ushort)this._server.Port;
 
-		public Server(string[] commandLineArgs, ushort port, params Type[] enabledRooms) {
+		public Server(string[] commandLineArgs, TAuth auther, ushort port, params Type[] enabledRooms) {
+			this._auth = auther;
+
 			this._players = new PlayerManager<TPlayer>();
 			this._rooms = new RoomManager<TPlayer>(enabledRooms);
 
@@ -26,12 +30,8 @@ namespace WSIO {
 		private PlayerManager<TPlayer> _players { get; }
 
 		public void Dispose() {
+			this._server.Dispose();
 		}
-
-		public void Test() {
-		}
-
-		private bool __________ = false;
 
 		public void Start() {
 			this._server.Start((socket) => {
@@ -57,7 +57,7 @@ namespace WSIO {
 					if (player != default(TPlayer)) {
 						
 						using (var ms = new MemoryStream(data))
-							ProtoSerializer.Handle(player, this._rooms, ms);
+							ProtoSerializer.Handle(player, this._auth, this._rooms, ms);
 					} else Console.WriteLine($"Could not find player for {socket?.ConnectionInfo?.ClientIpAddress}");
 				};
 
