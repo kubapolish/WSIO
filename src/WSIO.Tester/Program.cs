@@ -27,7 +27,10 @@ namespace WSIO.Tester
 			Console.WriteLine($"{p.Username} sent a message!");
 			Console.WriteLine(msg.Type);
 			foreach (var i in msg)
-				Console.WriteLine(i);
+				if (i is Array)
+					foreach (var j in i as Array)
+						Console.WriteLine(j);
+				else Console.WriteLine(i);
 		}
 
 		public override void OnLeave(MyPlayer p) => Console.WriteLine($"{p.Username} left!");
@@ -36,7 +39,7 @@ namespace WSIO.Tester
 	}
 
 	public class AnyAuthenticator : IAuthModule {
-		private Dictionary<string, IPassword> _creds = new Dictionary<string, IPassword>();
+		public Dictionary<string, DefaultPassword> _creds = new Dictionary<string, DefaultPassword>();
 
 		public IAuthResult Login(Authentication.ICredentials credentials, out IAuthToken token) {
 			Console.WriteLine("login");
@@ -63,7 +66,7 @@ namespace WSIO.Tester
 			Console.WriteLine("hashing");
 
 			credentials.Password.Hash();
-			_creds[credentials.Username] = credentials.Password;
+			_creds[credentials.Username] = (DefaultPassword)credentials.Password;
 
 			token = new AuthToken(credentials.Username);
 			return new AuthResult(true);
@@ -81,8 +84,13 @@ namespace WSIO.Tester
 	class Program
     {
         static void Main(string[] args) {
-			
-			using (var server = new Server<MyPlayer>(args, new AnyAuthenticator(), 80, typeof(BlockRoom))) {
+
+			var auth = new AnyAuthenticator();
+
+			if (System.IO.File.Exists("accs.json"))
+				auth._creds = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, DefaultPassword>>(System.IO.File.ReadAllText("accs.json"));
+
+			using (var server = new Server<MyPlayer>(args, auth, 80, typeof(BlockRoom))) {
 
 				//var p = server.Generate(new PlayerRequest("John Doe", "password1", null));
 				//var room = server.Send(p, new RoomRequest("wee fun", "blocks"));
@@ -93,6 +101,8 @@ namespace WSIO.Tester
 				server.Start();
 				Console.ReadLine();
 			}/**/
+
+			System.IO.File.WriteAllText("accs.json", Newtonsoft.Json.JsonConvert.SerializeObject(auth._creds));
         }
     }
 }

@@ -41,14 +41,15 @@ namespace WSIO {
 		public Room<TPlayer> FindOrAddBy(Room<TPlayer> item) => this._manager.FindOrAddBy(item);
 
 		public Room<TPlayer> FindOrCreateBy(RoomRequest request) {
-			var t = GetRoomForType(request.RoomType);
-			if (t == null) return null;
+			lock (this._manager._lock) {
+				var t = GetRoomForType(request.RoomType);
+				if (t == null) return null;
 
-			var rm = (Room<TPlayer>)Activator.CreateInstance(t);
-			rm.SetupBy(request);
+				var rm = (Room<TPlayer>)Activator.CreateInstance(t);
+				rm.SetupBy(request);
 
-			lock(this._manager._lock)
 				return this._manager.UnlockedExistsBy(request, out var __) ? __ : this.Create(t, request);
+			}
 		}
 
 		private Room<TPlayer> Create(Type t, RoomRequest request) {

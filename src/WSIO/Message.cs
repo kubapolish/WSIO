@@ -26,7 +26,7 @@ namespace WSIO
 				{7, typeof(bool) },
 				{8, typeof(string) },
 				{9, typeof(byte[]) },
-				{10, typeof(IMessageItem) },
+				{10, typeof(MessageItem) },
 			};
 
 			MessageItemTypeIds = Swap(MessageItemTypes);
@@ -52,8 +52,8 @@ namespace WSIO
 			this._items = res.Item2;
 		}
 
-		internal static List<IMessageItem> Serialize(object[] objs) {
-			var msgs = new List<IMessageItem>();
+		internal static List<MessageItem> Serialize(object[] objs) {
+			var msgs = new List<MessageItem>();
 
 			foreach(var i in objs) {
 				msgs.Add(new Messages.v1.MessageItem(i));

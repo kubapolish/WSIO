@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using WSIO.Attributes;
 
 namespace WSIO.Messages.v1 {
@@ -70,7 +70,7 @@ namespace WSIO.Messages.v1 {
 				} break;
 
 				case 10: {
-					this.InnerMessageItems = AsList<IMessageItem>(i);
+					this.InnerMessageItems = AsList<MessageItem>(i);
 				} break;
 
 				default: throw new Exception("Unexpected Case");
@@ -114,7 +114,7 @@ namespace WSIO.Messages.v1 {
 		public List<byte[]> ByteArrayValues { get; set; }
 
 		[ProtoMember(11)]
-		public List<IMessageItem> InnerMessageItems { get; set; }
+		public List<MessageItem> InnerMessageItems { get; set; }
 		
 		public object Value() {
 			switch(Type) {
@@ -165,8 +165,13 @@ namespace WSIO.Messages.v1 {
 				}
 				case 10: {
 					if (this.InnerMessageItems.Count < 2)
-						return this.InnerMessageItems[0];
-					else return this.InnerMessageItems.ToArray();
+						return this.InnerMessageItems[0].Value();
+					else {
+						var objs = new List<object>();
+						foreach (var i in this.InnerMessageItems)
+							objs.Add(i.Value());
+						return objs.ToArray();
+					}
 				}
 				default: throw new Exception();
 			}

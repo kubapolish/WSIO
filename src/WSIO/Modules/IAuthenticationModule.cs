@@ -11,8 +11,8 @@ namespace WSIO.Authentication {
 		void Hash();
 	}
 
-	internal struct PasswordStruct : IPassword {
-		public PasswordStruct(string password) {
+	public struct DefaultPassword : IPassword {
+		public DefaultPassword(string password) {
 			this.Password = password;
 			this.Hashed = false;
 		}
@@ -98,7 +98,7 @@ namespace WSIO.Authentication {
 namespace WSIO {
 	internal static partial class Helper {
 		public static IPassword Hash(this IPassword password) {
-			var ps = new PasswordStruct(password.Password);
+			var ps = new DefaultPassword(password.Password);
 
 			ps.Password = BCrypt.Net.BCrypt.HashPassword(ps.Password);
 

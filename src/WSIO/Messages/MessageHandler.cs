@@ -63,7 +63,7 @@ namespace WSIO.Messages {
 
 				if (ws.Username == null || ws.Password == null) {
 
-					var res = auther.Register(new Credentials(reg.Username, ws.Socket, new PasswordStruct(reg.Password), reg.Email), out var token);
+					var res = auther.Register(new Credentials(reg.Username, ws.Socket, new DefaultPassword(reg.Password), reg.Email), out var token);
 
 					if (res.Successful) {
 						// they've been registered, let's log them in now
@@ -106,7 +106,7 @@ namespace WSIO.Messages {
 
 				if (ws.Username == null || ws.Password == null) {
 
-					var res = auther.Login(new Credentials(auth.Username, ws.Socket, new PasswordStruct(auth.Password)), out var token);
+					var res = auther.Login(new Credentials(auth.Username, ws.Socket, new DefaultPassword(auth.Password)), out var token);
 
 					if (res.Successful) {
 

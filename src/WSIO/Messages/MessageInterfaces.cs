@@ -59,6 +59,6 @@ namespace WSIO.Messages {
 		[ProtoMember(10)]
 		List<byte[]> ByteArrayValues { get; set; }
 		[ProtoMember(11)]
-		List<IMessageItem> InnerMessageItems { get; set; }
+		List<MessageItem> InnerMessageItems { get; set; }
 	}
 }
